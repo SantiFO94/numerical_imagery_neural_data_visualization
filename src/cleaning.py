@@ -1,56 +1,58 @@
 import pandas as pd
+import ast
 
-
-def clean(df: pd.DataFrame) -> pd.DataFrame:
-    """
+def clean(df_input: pd.DataFrame) -> pd.DataFrame:
+    '''
     Clean the dataset:
-    - Handle null values
-    - Fix data types
-    - Drop unnecessary columns
-    - Remove duplicates
-    """
-    output_suffix = "_CLEAN"
+    - Remove whitespaces
+    - Fix numerical metadata types
+    - Drop invalid registries
+    - Convert signal to float values
+    '''
 
     # --- Copy to avoid mutating original df ---
-    df = df.copy()
-    # --- TODO limpiar todos los campos del dataset para quitar espacios en blanco antes y después de cada valor con .strip()
-    # --- TODO convertir a int los valores de evento, estimulo y tamaño
-    # --- TODO convertir a float los valores de las señales para poder usarlos en lso cálculos con signal = [float(x) for x in parts[6:] if x]
+    df = df_input.copy()
 
     # --- Basic validation ---
     if df.empty:
         raise ValueError("Input DataFrame is empty")
 
-    # --- Handle missing values --- #TODO cambiar nombres de columnas
-    if "children" in df.columns:
-        df["children"] = df["children"].fillna(0)
-
-#TODO cambiar nombres de columnas
-    if "country" in df.columns:
-        df["country"] = df["country"].fillna("Unknown")
-
-#TODO cambiar nombres de columnas
-    # --- Fix data types ---
-    if "is_canceled" in df.columns:
-        df["is_canceled"] = df["is_canceled"].astype(bool)
-
-#TODO cambiar nombres de columnas
-    # --- Drop unnecessary columns ---
-    if "company" in df.columns:
-        df = df.drop(columns=["company"])
-
     # --- Remove duplicates ---
     df = df.drop_duplicates()
-
-#TODO aplicar filtros digitales (como un filtro pasabanda o filtros Notch para quitar el ruido de la red eléctrica de 50/60 Hz
-
-#TODO implementar guardado de csv con datos limpios
-    # replace_symbol = '.'
-    # output_suffix = "_CLEAN."
     
-    # for name in input_names:
-    #     output_name = name.replace('.', output_suffix)
-    
-    # return pd.read_csv(path)
+    # --- 1. Remove leading and trailing whitespaces ---
+    for col in df.select_dtypes(include=['object']).columns:
+        df[col] = df[col].astype(str).str.strip()
+        
+    # --- 2. Fix columns types for further validations ---
+    numeric_cols = ['event', 'code', 'size']
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
 
+    print(df['signal'].iloc[0][-1])
+
+    if 'signal' in df.columns:
+        df['signal'] = df['signal'].apply(ast.literal_eval)
+
+        
+    # --- 3. Remove registries with invalid data
+    # Drop registries with null values in metadata
+    df = df.dropna(subset=numeric_cols)
+        
+    # Convert to integer type once invalid registries are discarded
+    df[numeric_cols] = df[numeric_cols].astype(int)
+    
+    # Drop registries without neural signal
+    df = df[len(df['signal']) > 0]
+
+    # --- 4. Convert signal to float type list ---
+    if 'signal' in df.columns:
+        df['signal'] = df['signal'].apply(lambda signals: [float(x) for x in signals])
+        
+    print('----------Cleaned dataset----------')
+    print(df.head())
+    print(df.describe())
+    
     return df
+    

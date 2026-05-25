@@ -1,27 +1,38 @@
 from pathlib import Path
 import pandas as pd
-from config import CSV_RAWS
+from src.config import CSV_RAWS
 
 
 
 def txt_transform_csv(path: str | Path, *input_names:  str):
     '''
-    Transforma uno o varios archivos .txt a archivos .csv.
-    
-    Separa todas las columnas separadas por una tabulación y
-    clasifica las 5 primeras como metadatos del registro.  
-    La última columna se considera la señal registrada y 
-    se separa cada registro por comas.
+    Transforms one or multiple .txt files into .csv format.
+
+    Parses lines separated by tabs, classifying the first 5 elements as 
+    metadata. The final column is treated as the recorded signal and 
+    is parsed by splitting comma-separated values.
     '''
     
-    print("Leyendo y estructurando el dataset de señales...")
+    print("Reading and transforming text files from input...")
 
     for name in input_names:
         data_rows = []
+        
+        output_name = name.replace('.txt', '.csv')
+        output_path = path / output_name
+        
+        # Check if file already exists to avoid unnecessary transformations
+        if output_path.exists():
+            print(f"The file {output_name} already exists. Avoiding transformation.")
+            CSV_RAWS.append(output_name)
+
+            continue
+        
+        print("Transforming file:", name)
 
         with open(path / name, "r") as file:
             for registry in file:
-                # Separar por comas cada línea
+                # Separar por tabulación cada línea
                 parts = registry.split("\t")
 
                 # Los primeros 6 elementos son los metadatos
@@ -44,24 +55,38 @@ def txt_transform_csv(path: str | Path, *input_names:  str):
                 data_rows.append(row)
 
         df = pd.DataFrame(data_rows)
-        output_name = name.replace('.txt','.csv')
         
-        df.to_csv(path / output_name, index=False)
+        print(f'----------File {name} transformed correctly----------')
+        print(df.head())
+                
+        df.to_csv(output_path, index=False)
         
         CSV_RAWS.append(output_name)
+    
+    print('.csv files names:', CSV_RAWS)
         
-def load_csv(path: str | Path, *input_names:  str):
-    """Load several CSV files into DataFrames."""
+def load_csv_files(path: str | Path, input_names: list[str]):
+    '''Load several CSV files into DataFrames'''
 
-    dataframes = []
+    dataframes = {}
     
     for name in input_names:
-        dataframes.append({name, load_csv(path / name)})
-    
+        dataframes[name] = pd.read_csv(path / name)
+        print(f'----------Loaded dataframe {name}----------')
+        print(dataframes[name].head())
+
     return dataframes
 
-
-def load_csv(path: str | Path):
-    """Load a CSV file into a DataFrame."""
+def save_csv_file(path: str | Path, name:  str, df, replace_symbol: str = None, output_suffix: str = None):
     
-    return pd.read_csv(path)
+    print(f'----------Saving file {name}----------')
+
+    output_name = name
+    
+    if replace_symbol and output_suffix:
+        output_name = name.replace(replace_symbol, output_suffix)
+    
+    df.to_csv(path / output_name, index=False)
+    
+    print(f'----------File {output_name} saved correctly----------')
+
