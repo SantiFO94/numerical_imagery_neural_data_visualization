@@ -78,13 +78,13 @@ def load_csv_files(path: str | Path, input_names: list[str]):
     return dataframes
 
 def save_csv_file(path: str | Path, name:  str, df, replace_symbol: str = None, output_suffix: str = None):
-    
-    print(f'----------Saving file {name}----------')
 
     output_name = name
     
     if replace_symbol and output_suffix:
         output_name = name.replace(replace_symbol, output_suffix)
+    
+    print(f'----------Saving file {output_name}----------')
     
     df.to_csv(path / output_name, index=False)
     

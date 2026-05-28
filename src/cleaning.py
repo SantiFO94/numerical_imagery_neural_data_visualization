@@ -1,5 +1,6 @@
 import pandas as pd
-import ast
+from IPython.display import display
+from src.utils import parse_strings_list
 
 def clean(df_input: pd.DataFrame) -> pd.DataFrame:
     '''
@@ -20,6 +21,8 @@ def clean(df_input: pd.DataFrame) -> pd.DataFrame:
     # --- Remove duplicates ---
     df = df.drop_duplicates()
     
+    print('Duplicated rows:', df.duplicated().sum())
+
     # --- 1. Remove leading and trailing whitespaces ---
     for col in df.select_dtypes(include=['object']).columns:
         df[col] = df[col].astype(str).str.strip()
@@ -30,21 +33,25 @@ def clean(df_input: pd.DataFrame) -> pd.DataFrame:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
 
-    print(df['signal'].iloc[0][-1])
+    print('Last value of first registered signal before processing:', df['signal'].iloc[0][-1])
 
     if 'signal' in df.columns:
-        df['signal'] = df['signal'].apply(ast.literal_eval)
-
+        df['signal'] = df['signal'].apply(parse_strings_list)
         
+    print('Last value of first registered signal after processing:', df['signal'].iloc[0][-1])
+     
     # --- 3. Remove registries with invalid data
     # Drop registries with null values in metadata
     df = df.dropna(subset=numeric_cols)
-        
+    
+    print('Null values by column:')
+    display(df.isna().sum())
+    
     # Convert to integer type once invalid registries are discarded
     df[numeric_cols] = df[numeric_cols].astype(int)
     
     # Drop registries without neural signal
-    df = df[len(df['signal']) > 0]
+    df = df[df['signal'].apply(len) > 0]
 
     # --- 4. Convert signal to float type list ---
     if 'signal' in df.columns:
@@ -55,4 +62,3 @@ def clean(df_input: pd.DataFrame) -> pd.DataFrame:
     print(df.describe())
     
     return df
-    
