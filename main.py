@@ -28,8 +28,6 @@ def main():
     
     save_csv_file(OUT_PATH, 'features', df_features)
 
-    # assert_columns(df, ['column_1', 'column_2'])
-
     # Llamada a la función
     # plot_psd(f, Pxx)
     # plot_device_comparison
