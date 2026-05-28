@@ -3,8 +3,7 @@ from src.config import RAW_PATH, EP_RAW, IN_RAW, CSV_RAWS, OUT_PATH
 from src.io import txt_transform_csv, load_csv_files, save_csv_file
 from src.cleaning import clean
 from src.features import build_features
-from src.utils import assert_columns
-from src.viz import plot_graph
+from src.viz import plot_event_comparison, avg_powers_comparison
 
 
 def main():
@@ -23,13 +22,13 @@ def main():
         save_csv_file(OUT_PATH, name, df, replace_symbol= '.', output_suffix = '_clean.')
     
     df_complete = pd.concat(dataframes.values(), ignore_index=True) #Ignore index omite los indices de cada registro para evitar conflictos más adelante
-
+                
     df_features = build_features(df_complete)
     
-    save_csv_file(OUT_PATH, 'features', df_features)
+    save_csv_file(OUT_PATH, 'features.csv', df_features)
 
-    # Llamada a la función
-    # plot_psd(f, Pxx)
+    avg_powers_comparison(df_features)
+    
     # plot_device_comparison
     
     # OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
