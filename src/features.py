@@ -19,18 +19,15 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
                 print(f'----------Calculating bandwith between frequencies {low} and {high}----------')
 
                 df[band_name] = df['signal'].apply(lambda s: bandpower(s, low, high))
-                
-        # df['delta'] = bandpower(df['signal'], 0.5, 4)
-        # df["theta"] = bandpower(df['signal'], 4, 8)
-        # df["alpha"] = bandpower(df['signal'], 8, 12)
-        # df["beta"] = bandpower(df['signal'], 13, 30)
-        # df["gamma"] = bandpower(df['signal'], 30, 40)
-
+        
+     
         # Remove raw signal column 
-        df = df.drop('signal')
+        df = df.drop(columns=['signal'], errors='ignore')
         
         print('----------Finished extracting features from raw EEG data----------')
-        df.head()
+        print('First rows from features dataframe\n', df.head())
+        
+        return df
     
 
 def bandpower(signal, low, high):
