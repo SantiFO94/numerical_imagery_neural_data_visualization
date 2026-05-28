@@ -31,17 +31,19 @@ def txt_transform_csv(path: str | Path, *input_names:  str):
         print("Transforming file:", name)
 
         with open(path / name, "r") as file:
-            for registry in file:
+            for i, registry in enumerate(file):
+                if i >= 5000: # Only read 5000 rows
+                    break
                 # Separar por tabulación cada línea
                 parts = registry.split("\t")
 
-                # Los primeros 6 elementos son los metadatos
+                # First 5 elements are metadata
                 metadata = parts[:6]
 
-                # El resto de la línea es la señal neuronal
+                # Final element corresponds to the EEG signal
                 signal = parts[6].split(",")
 
-                # Creamos un diccionario limpio por cada fila
+                # Create a dictionary for each row
                 row = {
                     "id": metadata[0],
                     "event": metadata[1],
