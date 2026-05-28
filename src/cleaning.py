@@ -58,6 +58,7 @@ def clean(df_input: pd.DataFrame) -> pd.DataFrame:
         df['signal'] = df['signal'].apply(lambda signals: [float(x) for x in signals])
         
     print('----------Cleaned dataset----------')
+    print('Dataset rows and columns:', df.shape)
     print(df.head())
     print(df.describe())
     
