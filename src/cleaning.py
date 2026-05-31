@@ -63,3 +63,8 @@ def clean(df_input: pd.DataFrame) -> pd.DataFrame:
     print(df.describe())
     
     return df
+
+def remove_electrodes(df_input: pd.DataFrame, column, electrode) -> pd.DataFrame:
+
+    # Filter electrodes by column and electrode value
+    return df_input[(df_input[column] != electrode)]

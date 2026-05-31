@@ -6,10 +6,59 @@ from src.constants import bands
 from src.config import GRAPHS
 
 
+def plot_cortical_insights(df_hemispheres: pd.DataFrame, df_lobes: pd.DataFrame):
+    """
+    Generates graphs representing activity by different cortical areas
+    """
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    
+    # Graph 1: Hemispheric ativation.
+    # median used to avoid outliers in signal power overflowing the visualization
+    sns.barplot(
+            data=df_hemispheres, 
+            x='hemisphere', 
+            y='signal_power', 
+            hue='device', 
+            ax=axes[0],
+            palette='Set2',
+            estimator=np.median,
+            errorbar=('ci', 95),
+            capsize=0.1
+    )
+    
+    axes[0].set_title('Hemispheric activity')
+    axes[0].set_xlabel('Hemisphere', fontsize=12)
+    axes[0].set_ylabel('Median Power', fontsize=12)
+    
+    # Graph 2: Cortical lobes
+    sns.barplot(
+        data=df_lobes, 
+        x='lobe', 
+        y='signal_power', 
+        hue='device', 
+        ax=axes[1],
+        palette='Set2',
+        estimator=np.median,
+        errorbar=('ci', 95),
+        capsize=0.1
+    )
+    
+    axes[1].set_title('Cortical lobes activity')
+    axes[1].set_xlabel('Cortical lobe', fontsize=12)
+    axes[1].set_ylabel('Potencia Mediana (Signal Power)', fontsize=12)
+    
+    plt.suptitle('Insights of hemispheric and cortical activity', fontsize=16, fontweight='bold')
+    plt.tight_layout()
+    
+    plt.savefig(GRAPHS / "cortical_activity.png", bbox_inches='tight')
+
+    plt.show()
+    
+    
 def plot_stimulus_comparison(df: pd.DataFrame):
     """
-    Genera un gráfico para responder a la pregunta del README:
-    - ¿Existen diferencias de activación entre distintos estímulos (números)?
+    Visualization of differences of activity power among different stimulus
     """
     plt.figure(figsize=(12, 6))
     
@@ -22,7 +71,7 @@ def plot_stimulus_comparison(df: pd.DataFrame):
         estimator=np.median,
         errorbar=('ci', 95),
         capsize=0.05,
-        dodge=True # Separa ligeramente los puntos de IN y EP para mayor claridad
+        dodge=True 
     )
     
     plt.title('Comparación de Activación por Estímulo Pensado (0-9)', fontsize=15)
@@ -35,10 +84,8 @@ def plot_stimulus_comparison(df: pd.DataFrame):
     plt.show()
     
 def avg_powers_comparison(df: pd.DataFrame):
-    # 1. Definimos las bandas según tu configuración de features.py
-    # bands = ['delta', 'theta', 'alpha', 'beta', 'gamma']
     
-    # 2. Transformamos el DataFrame al formato "long" (tidy data)
+    # Transformamos el DataFrame al formato "long" (tidy data)
     # Esto coloca todas las bandas en una sola columna para facilitar la agrupación
     df_long = df.melt(
         id_vars=['code', 'device'], 
@@ -47,7 +94,7 @@ def avg_powers_comparison(df: pd.DataFrame):
         value_name='Power'
     )
     
-    # 3. Creamos el gráfico (Faceting por código/número)
+    # Creamos el gráfico (Faceting por código/número)
     # 'col=code' creará un gráfico distinto para cada número (0, 1, 2...)
     catplot = sns.catplot(
         data=df_long, 
@@ -71,46 +118,6 @@ def avg_powers_comparison(df: pd.DataFrame):
 
     plt.show()
 
-
-def plot_power_by_band_and_event(df: pd.DataFrame):
-    """
-    Generates comparative charts of mean power per frequency band,
-    grouping by event and device.
-    """
-    # 1. Define frequency bands based on configuration
-    # bands = ['delta', 'theta', 'alpha', 'beta', 'gamma']
-    
-    # 2. Transform the DataFrame to long format (tidy data)
-    # This places all bands into a single column to facilitate grouping
-    df_long = df.melt(
-        id_vars=['event', 'device'], 
-        value_vars=bands, 
-        var_name='Band', 
-        value_name='Power'
-    )
-    
-    # 3. Create the plot (Faceting by event)
-    # Seaborn automatically creates a subplot for each 'event'
-    g = sns.catplot(
-        data=df_long, 
-        kind='bar',
-        x='Band', 
-        y='Power', 
-        hue='device', 
-        col='event', 
-        col_wrap=5,  # Organize events in rows of 5
-        palette='muted',
-        height=3, 
-        aspect=1.2
-    )
-    
-    g.set_titles("Event: {col_name}")
-    g.set_axis_labels("Frequency Band", "Mean Power")
-    plt.subplots_adjust(top=0.9)
-    g.fig.suptitle('Mean Power per Band by Event and Device', fontsize=16)
-    plt.savefig(GRAPHS / "power_band_event.png", bbox_inches='tight')
-
-    plt.show()
     
 # Graph different bandwith frequencies
 def plot_psd(f, Pxx):
@@ -140,97 +147,4 @@ def plot_psd(f, Pxx):
     plt.legend()
     plt.grid(True, which="both", ls="-", alpha=0.2)
     print('----------Signal power plot----------')
-    plt.show()
-
-
-def plot_device_comparison(df: pd.DataFrame):
-
-    unique_codes = df['code'].unique()
-    
-    for code in unique_codes:
-        # Filtramos los datos para el código actual
-        df_code = df[df['code'] == code]
-        
-        # Identificamos los dispositivos presentes en este código
-        dispositivos = df_code['device'].unique()
-        
-        # Preparamos el gráfico
-        fig, ax = plt.subplots(figsize=(10, 5))
-        x = np.arange(len(bands))
-        width = 0.35
-        
-        # Dibujamos una barra por cada dispositivo
-        for i, device in enumerate(dispositivos):
-            df_dev = df_code[df_code['device'] == device]
-            
-            # Promediamos las potencias de todas las filas para ese dispositivo
-            # (asumiendo que tienes varias muestras para el mismo dispositivo/código)
-            medias = [df_dev[banda].mean() for banda in bands]
-            
-            # Calculamos el desplazamiento para que no se encimen
-            offset = (i - 0.5) * width
-            ax.bar(x + offset, medias, width, label=f'Device: {device}')
-            
-        ax.set_title(f'Comparación de Potencia por Banda - Código: {code}')
-        ax.set_xticks(x)
-        ax.set_xticklabels([b.capitalize() for b in bands])
-        ax.set_ylabel('Potencia Relativa Media')
-        ax.legend()
-        plt.grid(axis='y', linestyle='--', alpha=0.7)
-
-    plt.savefig(GRAPHS / "device_comparison.png", bbox_inches='tight')
-
-    print('----------Devices comparison plots----------')
-    plt.show()
-    
-def plot_cortical_insights(df: pd.DataFrame):
-    """
-    Genera gráficos para responder a las preguntas del README:
-    1. Activación hemisférica (Left/Right)
-    2. Activación por lóbulo cortical
-    """
-    df = df.copy()
-
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-    
-    # Graph 1: Hemispheric ativation.
-    # median used to avoid outliers in signal power overflowing the visualization
-    sns.barplot(
-            data=df, 
-            x='Hemisphere', 
-            y='signal_power', 
-            hue='device', 
-            ax=axes[0],
-            palette='Set2',
-            estimator=np.median,
-            errorbar=('ci', 95),
-            capsize=0.1
-    )
-    
-    axes[0].set_title('Hemispheric activity')
-    axes[0].set_xlabel('Hemisphere', fontsize=12)
-    axes[0].set_ylabel('Median Power', fontsize=12)
-    
-    # Gráfico 2: Cortical lobes
-    sns.barplot(
-        data=df, 
-        x='Lobe', 
-        y='signal_power', 
-        hue='device', 
-        ax=axes[1],
-        palette='Set2',
-        estimator=np.median,
-        errorbar=('ci', 95),
-        capsize=0.1
-    )
-    
-    axes[1].set_title('Cortical lobes activity')
-    axes[1].set_xlabel('Cortical lobe', fontsize=12)
-    axes[1].set_ylabel('Potencia Mediana (Signal Power)', fontsize=12)
-    
-    plt.suptitle('Insights of hemispheric and cortical activity', fontsize=16, fontweight='bold')
-    plt.tight_layout()
-    
-    plt.savefig(GRAPHS / "cortical_activity.png", bbox_inches='tight')
-
     plt.show()

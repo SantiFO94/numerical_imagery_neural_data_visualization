@@ -9,8 +9,8 @@ def build_features(df: pd.DataFrame) -> pd.DataFrame:
         print('----------Start extracting features from raw EEG data----------')
 
         # Channel identification features
-        df['Hemisphere'] = df['channel'].apply(get_hemisphere)
-        df['Lobe'] = df['channel'].apply(get_lobe)
+        df['hemisphere'] = df['channel'].apply(get_hemisphere)
+        df['lobe'] = df['channel'].apply(get_lobe)
         
         # Temporal features
         df['signal_mean'] = df['signal'].apply(np.mean)
