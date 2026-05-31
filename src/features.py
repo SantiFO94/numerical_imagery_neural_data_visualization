@@ -1,12 +1,17 @@
 import pandas as pd
 import numpy as np
 from scipy.signal import welch
+from src.utils import get_hemisphere, get_lobe
 
 def build_features(df: pd.DataFrame) -> pd.DataFrame:
         
         df = df.copy()
         print('----------Start extracting features from raw EEG data----------')
 
+        # Channel identification features
+        df['Hemisphere'] = df['channel'].apply(get_hemisphere)
+        df['Lobe'] = df['channel'].apply(get_lobe)
+        
         # Temporal features
         df['signal_mean'] = df['signal'].apply(np.mean)
         df['signal_variance'] = df['signal'].apply(np.var)

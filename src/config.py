@@ -1,7 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-
+DATA = ROOT / "data"
 # Change these paths to point to your data files
 RAW_PATH = ROOT / "data" / "raw"
 EP_RAW = "EP.txt"
@@ -11,4 +11,5 @@ MW_RAW = "MW.txt"
 
 CSV_RAWS = []
 
-OUT_PATH = ROOT / "data" / "processed"
+OUT_PATH = DATA / "processed"
+GRAPHS = DATA / "saved_graphs"

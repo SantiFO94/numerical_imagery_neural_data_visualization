@@ -3,7 +3,7 @@ from src.config import RAW_PATH, EP_RAW, IN_RAW, CSV_RAWS, OUT_PATH
 from src.io import txt_transform_csv, load_csv_files, save_csv_file
 from src.cleaning import clean
 from src.features import build_features
-from src.viz import plot_event_comparison, avg_powers_comparison
+from src.viz import avg_powers_comparison, plot_power_by_band_and_event, plot_cortical_insights, plot_stimulus_comparison
 
 
 def main():
@@ -27,13 +27,14 @@ def main():
     
     save_csv_file(OUT_PATH, 'features.csv', df_features)
 
-    avg_powers_comparison(df_features)
+    plot_cortical_insights(df_features) # Cortical activity
+    plot_stimulus_comparison(df_features) # Pointplot showing activity by stimulus
+    avg_powers_comparison(df_features) # Potencias medias para cada numero en cada banda
+    plot_power_by_band_and_event(df_features) # Barplot with signal power by stimulus and device in each bandwith
+
+    # plot_device_comparison(df_features)
     
-    # plot_device_comparison
-    
-    # OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    # df.to_csv(OUT_PATH, index=False)
-    # print(f"Saved: {OUT_PATH}")
+
 
 
 if __name__ == "__main__":
