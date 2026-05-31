@@ -40,7 +40,7 @@
     - features.py: Extracción de características temporales y de frecuencia.
     - viz.py: Visualizaciones de datos.
 - main.py: Punto de entrada del pipeline completo.
-'''
+```
 project/
 ├── main.py
 ├── data/
@@ -59,8 +59,10 @@ project/
 ├── README.md
 ├── .gitignore
 └── requirements.txt
-'''
+```
 ### 8) Cómo ejecutar
+- Descargar los datasets 1.2M Brain Signal Data: https://www.kaggle.com/datasets/vijayveersingh/1-2m-brain-signal-data/data
+- Copiarlos a la carpeta data/raw
 - `pip install -r requirements.txt`
 - Ejecutar pipeline: `python main.py`
 - (Opcional) Abrir y ejecutar: `notebooks/eda.ipynb`
