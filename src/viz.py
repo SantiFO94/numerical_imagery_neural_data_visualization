@@ -67,7 +67,7 @@ def plot_stimulus_comparison(df: pd.DataFrame):
         x='code',
         y='signal_power',
         hue='device',
-        palette='viridis',
+        palette='Set2',
         estimator=np.median,
         errorbar=('ci', 95),
         capsize=0.05,
@@ -104,7 +104,7 @@ def avg_powers_comparison(df: pd.DataFrame):
         hue='device', 
         col='code', 
         col_wrap=4,  # Ajusta según cuántos códigos tengas
-        palette='viridis',
+        palette='Set2',
         height=3.5, 
         aspect=1.0,
         sharey=True # Mantenemos la misma escala Y para comparar fácilmente entre códigos

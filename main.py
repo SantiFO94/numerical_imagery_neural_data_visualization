@@ -33,14 +33,13 @@ def main():
     # Data visualization to analyze features
     
     df_hemispheres = remove_electrodes(df_features, 'channel', 'PZ')
-    df_lobes = remove_electrodes(df_features, 'Lobe', 'Occipital')
+    df_lobes = remove_electrodes(df_features, 'lobe', 'Occipital')
     plot_cortical_insights(df_hemispheres, df_lobes) # Cortical activity
     
+    plot_stimulus_comparison(df_features) # Pointplot showing activity by stimulus
     
-    # plot_stimulus_comparison(df_features) # Pointplot showing activity by stimulus
-    # avg_powers_comparison(df_features) # Potencias medias para cada numero en cada banda
+    avg_powers_comparison(df_features) # Potencias medias para cada numero en cada banda
  
-
 
 
 if __name__ == "__main__":
