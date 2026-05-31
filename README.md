@@ -40,7 +40,7 @@
     - features.py: Extracción de características temporales y de frecuencia.
     - viz.py: Visualizaciones de datos.
 - main.py: Punto de entrada del pipeline completo.
-
+'''
 project/
 ├── main.py
 ├── data/
@@ -59,7 +59,7 @@ project/
 ├── README.md
 ├── .gitignore
 └── requirements.txt
-
+'''
 ### 8) Cómo ejecutar
 - `pip install -r requirements.txt`
 - Ejecutar pipeline: `python main.py`
