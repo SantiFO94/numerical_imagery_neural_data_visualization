@@ -1,5 +1,3 @@
-## Plantilla de README
-
 ### 1) Objetivo
 - Analizar y procesar un dataset de señales neuronales (EEG) para identificar patrones de activación cerebral. El objetivo es automatizar la limpieza de datos, extraer características relevantes en el dominio del tiempo y la frecuencia, y generar visualizaciones que permitan comparar el comportamiento entre diferentes dispositivos y estímulos.
 
